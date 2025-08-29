@@ -6,7 +6,7 @@
 import Packet from "./Packet.js";
 import PacketType from "./PacketType.js";
 import PacketHandler from "./PacketHandler.js";
-import Node from "./library/Node.js";
+import Node from "../library/Node.js";
 
 export default class Multiplayer extends Node {
     /**

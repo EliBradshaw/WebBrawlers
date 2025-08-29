@@ -1,4 +1,4 @@
-import Node from "./library/Node.js";
+import Node from "../library/Node.js";
 import Packet from "./Packet.js";
 import {
     PacketTypeNames

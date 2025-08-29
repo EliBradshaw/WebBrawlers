@@ -1,6 +1,6 @@
+import CombatScene from "./scenes/CombatScene.js";
 import Engine from "./library/Engine.js";
-import MenuScene from "./MenuScene.js";
-import Multiplayer from "./Multiplayer.js";
+import Multiplayer from "./multiplayer/Multiplayer.js";
 
 
 let multiplayer = new Multiplayer({
@@ -23,4 +23,4 @@ let multiplayer = new Multiplayer({
 
 
 Engine.init();
-Engine.root.adopt(new MenuScene(multiplayer));
+Engine.root.adopt(new CombatScene());
