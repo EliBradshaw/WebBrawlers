@@ -10,9 +10,18 @@ export default class Character extends MovingNode {
         this.velocity = new Vector();
 
         this.stats = {
-            speed: 1,
+            acceleration: 20, // frames until full values are reached
+            airAcceleration: 100,
+            deaccel: 2,
+            landingDeaccel: 0.2, // % left after landing
+
+            switchupSpeed: 0.8, // % taken off speed when velx is opposite as wanted
+            speed: 5,
+
+            jumpFalloff: 0.8, // % taken off y when jump is not held and still going up
             jumpHeight: 15,
-            gravity: 0.1,
+            gravity: 0.5,
+            coyoteTime: 10 // frames after leaving a platform where jump is still allowed
         }
 
         this.colFlags = {
@@ -25,10 +34,6 @@ export default class Character extends MovingNode {
 
     update() {
         this.controller.update();
-        this.velocity.y += this.stats.gravity;
-        if (this.colFlags.bottom) {
-            this.velocity.y = 0;
-        }
     }
 
     render(ctx) {
@@ -39,14 +44,17 @@ export default class Character extends MovingNode {
 
 
     /** Accepts any col node with a collidesWithBox method */
-    considerCollision(col) {
+    wipeCols() {
         this.colFlags = {
             top: false,
             bottom: false,
             left: false,
             right: false
         };
+    }
 
+    considerCollision(col) {
+        let change = this.offset.clone();
         // Get positions and dimensions
         let a = this.getGlobalPosition();
         let b = col.getGlobalPosition();
@@ -54,7 +62,7 @@ export default class Character extends MovingNode {
         let bw = col.dimensions.x, bh = col.dimensions.y;
 
         // Only check if colliding at all
-        if (!col.collidesWithBox(this)) return;
+        if (!col.collidesWithBox(this)) return change;
 
         // Calculate overlap on each side
         let dx = (a.x + aw / 2) - (b.x + bw / 2);
@@ -70,23 +78,24 @@ export default class Character extends MovingNode {
             if (dx > 0) {
                 this.colFlags.left = true; // Character's left hits col's right
                 // Snap character's left to col's right
-                this.offset.x = b.x + bw;
+                change.x = b.x + bw;
             } else {
                 this.colFlags.right = true; // Character's right hits col's left
                 // Snap character's right to col's left
-                this.offset.x = b.x - aw;
+                change.x = b.x - aw;
             }
         } else {
             // Colliding more on Y axis
             if (dy > 0) {
                 this.colFlags.top = true; // Character's top hits col's bottom
                 // Snap character's top to col's bottom
-                this.offset.y = b.y + bh;
+                change.y = b.y + bh;
             } else {
                 this.colFlags.bottom = true; // Character's bottom hits col's top
                 // Snap character's bottom to col's top
-                this.offset.y = b.y - ah;
+                change.y = b.y - ah;
             }
         }
+        return change;
     }
 }

@@ -42,6 +42,12 @@ export default class Vector {
         return this;
     }
 
+    set(x, y) {
+        this.x = x;
+        this.y = y;
+        return this;
+    }
+
     /** Returns a copy of this vector */
     clone() {
         return new Vector(this.x, this.y);

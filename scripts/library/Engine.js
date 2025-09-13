@@ -11,9 +11,9 @@ export default class Engine {
     static ctx = null;
     static ui = null;
 
-    static debug = {
-        fps: true,
-    }
+    static debugText = "";
+    static debugEnabled = true;
+
     static init() {
         const canvas = document.getElementById("board");
         Engine.ctx = canvas.getContext("2d");
@@ -29,7 +29,14 @@ export default class Engine {
         Engine.loop();
     }
 
+    static debug(logMessage) {
+        Engine.debugText += logMessage + "\n";
+    }
+
     static loop() {
+        Engine.debugText = "";
+        
+        Engine.debugText += `FPS: ${Math.round(1000 / Engine.waitMS)}\n`
         let before = performance.now();
         Engine.root.tick(Engine.ctx);
         let after = performance.now();
@@ -39,11 +46,15 @@ export default class Engine {
         Engine.waitMS += Engine.perfectMS - timeSpent;
         Engine.waitMS /= smoothing;
 
-        if (Engine.debug.fps) {
+        if (Engine.debugText.length > 0 && Engine.debugEnabled) {
+            let lines = Engine.debugText.split("\n");
             Engine.ctx.fillStyle = "black";
-            Engine.ctx.fillRect(0, 0, 50, 25);
-            Engine.ctx.fillStyle = "white";
-            Engine.ctx.fillText(`FPS: ${Math.round(1000 / Engine.waitMS)}`, 10, 20);
+            Engine.ctx.fillRect(0, 0, 100, 10*lines.length);
+            for (let i in lines) {
+                let line = lines[i];
+                Engine.ctx.fillStyle = "white";
+                Engine.ctx.fillText(line, 10, 1.5*(i+1)+7);
+            }
         }
 
         setTimeout(Engine.loop, Engine.waitMS);
