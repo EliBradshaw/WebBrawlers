@@ -18,6 +18,7 @@ export default class Engine {
         const canvas = document.getElementById("board");
         Engine.ctx = canvas.getContext("2d");
 
+
         const ui = document.getElementById("ui");
         Engine.ui = ui;
 

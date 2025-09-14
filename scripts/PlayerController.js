@@ -61,5 +61,17 @@ export default class PlayerController extends Controller {
         } else {
             this.coyoteTime--;
         }
+
+        if (Math.abs(vel.x) < 0.1)
+            chr.aniTree.play("idle");
+        else if (cols.bottom) {
+            chr.aniTree.play("walk");
+            let speed = 25-Math.abs(vel.x) * 5;
+            chr.aniTree.currentAnimation.settings.tpf = speed;
+        } else {
+            chr.aniTree.play("jump");
+        }
+
+        chr.aniTree.isFlipped = vel.x < 0
     }
 }

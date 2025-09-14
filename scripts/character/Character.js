@@ -1,3 +1,5 @@
+import Animation from "../library/animation/Animation.js";
+import AnimationTree from "../library/animation/AnimationTree.js";
 import MovingNode from "../library/MovingNode.js";
 import Node from "../library/Node.js";
 import Vector from "../library/Vector.js";
@@ -30,6 +32,31 @@ export default class Character extends MovingNode {
             left: false,
             right: false
         };
+        this.aniTree = null;
+        this.adopt(this.aniTree = new AnimationTree(
+            new Animation({
+                path: "player_idle",
+                frames: 2,
+                title: "idle",
+                tpf: 40,
+                scale: 3,
+            }).nudge(0, 2),
+            new Animation({
+                path: "player_walk",
+                frames: 4,
+                title: "walk",
+                tpf: 5,
+                scale: 3,
+            }).nudge(0, 2),
+            new Animation({
+                path: "player_jump",
+                frames: 6,
+                title: "jump",
+                tpf: 10,
+                scale: 3,
+            }).nudge(0, 2),
+        ));
+        this.aniTree.play("walk");
     }
 
     update() {
@@ -37,6 +64,7 @@ export default class Character extends MovingNode {
     }
 
     render(ctx) {
+        return;
         let pos = this.getGlobalPosition();
         ctx.fillStyle = "red";
         ctx.fillRect(pos.x, pos.y, this.dimensions.x, this.dimensions.y);
@@ -61,8 +89,11 @@ export default class Character extends MovingNode {
         let aw = this.dimensions.x, ah = this.dimensions.y;
         let bw = col.dimensions.x, bh = col.dimensions.y;
 
+
         // Only check if colliding at all
+        this.offset.y += 1;
         if (!col.collidesWithBox(this)) return change;
+        this.offset.y -= 1;
 
         // Calculate overlap on each side
         let dx = (a.x + aw / 2) - (b.x + bw / 2);

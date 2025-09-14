@@ -16,8 +16,15 @@ export default class Node {
         this.parent = null;
     }
 
+    nudge(vec, y) {
+        if (typeof vec != "object")
+            vec = new Vector(vec, y);
+        this.offset.add(vec);
+        return this;
+    }
+
     moveGloballyTo(vec, y) {
-        if (y)
+        if (typeof vec != "object")
             vec = new Vector(vec, y);
         let currentPos = this.getGlobalPosition();
         let diff = vec.without(currentPos);
