@@ -2,26 +2,31 @@ import Animation from "../library/animation/Animation.js";
 import AnimationTree from "../library/animation/AnimationTree.js";
 import MovingNode from "../library/MovingNode.js";
 import Node from "../library/Node.js";
+import Sprite from "../library/Sprite.js";
 import Vector from "../library/Vector.js";
+import Controller from "./Controller.js";
 
 export default class Character extends MovingNode {
     constructor(controllerClass) {
         super();
+        this.controllerClass = controllerClass;
         this.controller = new controllerClass(this);
-        this.dimensions = new Vector(50, 50);
+        this.dimensions = new Vector(50, 35);
         this.velocity = new Vector();
 
         this.stats = {
             acceleration: 20, // frames until full values are reached
-            airAcceleration: 100,
+            airAcceleration: 25,
             deaccel: 2,
-            landingDeaccel: 0.2, // % left after landing
+            landingDeaccel: 1.5, // % left after landing
+            fastFall: 0.25,
 
             switchupSpeed: 0.8, // % taken off speed when velx is opposite as wanted
+            switchupSpeedAir : 1,
             speed: 5,
 
             jumpFalloff: 0.8, // % taken off y when jump is not held and still going up
-            jumpHeight: 15,
+            jumpHeight: 10,
             gravity: 0.5,
             coyoteTime: 10 // frames after leaving a platform where jump is still allowed
         }
@@ -55,21 +60,51 @@ export default class Character extends MovingNode {
                 tpf: 10,
                 scale: 3,
             }).nudge(0, 2),
-        ));
+        ).nudge(0, -13));
         this.aniTree.play("walk");
+
+        this.adopt(this.sword = new Sprite("sword.png", 0.05, 45, new Vector(1, 1)));
     }
 
     update() {
+        if (this.controllerClass == Controller) // Assume dummy controller for puppets
+            return;
         this.controller.update();
-    }
+    } 
 
     render(ctx) {
-        return;
+        return; // Rendering is handled by the player sprite
         let pos = this.getGlobalPosition();
         ctx.fillStyle = "red";
         ctx.fillRect(pos.x, pos.y, this.dimensions.x, this.dimensions.y);
     }
 
+    getMultiUpdate() {
+        let pos = this.getGlobalPosition();
+        let facing = this.aniTree.isFlipped;
+        let currentAnim = this.aniTree.currentAnimation.settings.title;
+        let currentFrame = this.aniTree.currentAnimation.currentFrame;
+        let swordRotation = this.sword.rotation;
+        return {
+            x: pos.x,
+            y: pos.y,
+            facing,
+            currentAnim,
+            currentFrame,
+            swordRotation
+        };
+    }
+
+    receiveMultiUpdate(data) {
+        this.setGlobalPosition(new Vector(data.x, data.y));
+        let anim = this.aniTree.animations[data.currentAnim];
+        if (anim) {
+            this.aniTree.play(anim.settings.title);
+        }
+        this.aniTree.currentAnimation.currentFrame = data.currentFrame;
+        this.aniTree.isFlipped = data.facing;
+        this.sword.rotation = data.swordRotation;
+    }
 
     /** Accepts any col node with a collidesWithBox method */
     wipeCols() {

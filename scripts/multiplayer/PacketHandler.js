@@ -1,4 +1,7 @@
+import Engine from "../library/Engine.js";
 import Node from "../library/Node.js";
+import Vector from "../library/Vector.js";
+import CombatScene from "../scenes/CombatScene.js";
 import Packet from "./Packet.js";
 import {
     PacketTypeNames
@@ -36,11 +39,46 @@ export default class PacketHandler extends Node {
             this.usernames.push(username);
         }
         this.usernameToConnections[username] = connection;
+        this.mp.connectionToUsername[connection.peer] = username;
         // Sync with Lobby UI
         const menuScene = Node.getNode('MenuScene');
-        if (menuScene && typeof menuScene.updateLobby === 'function') {
+        if (menuScene) {
             menuScene.updateLobby(this.usernames);
         }
         console.log("Lobby usernames:", this.usernames);
+    }
+
+    type_gotoCombat(data, connection) {
+        console.log("Received gotoCombat packet:", data);
+        // Transition to CombatScene
+        const menuScene = Node.getNode('MenuScene');
+        if (menuScene) {
+            menuScene.active = false;
+            Engine.root.adopt(new CombatScene());
+        }
+    }
+
+    type_updatePosition(data, connection) {
+        let { multi, username, x, y } = data;
+        // Update the character's position in the game state
+        // Implementation depends on how characters are managed
+        if (!this.mp.isHost) {
+            // Handle multiple characters
+            multi.forEach(char => {
+                if (char.username == this.mp.username) return;
+                // Update character position logic here
+                let cs = Node.getNode('CombatScene');
+                let chr = cs.connToChar[char.conn.peer];
+                if (!chr) cs.addPlayer(char.conn);
+                chr = cs.connToChar[char.conn.peer];
+                chr.receiveMultiUpdate(char.chM);
+            });
+            return;
+        }
+        let cs = Node.getNode('CombatScene');
+        let chr = cs.connToChar[connection.peer];
+        if (!chr) cs.addPlayer(connection);
+        chr = cs.connToChar[connection.peer];
+        chr.receiveMultiUpdate(data.chM);
     }
 }

@@ -1,5 +1,10 @@
-import Engine from "./library/Engine.js";
-import Node from "./library/Node.js";
+import Node from "../library/Node.js";
+import Engine from "../library/Engine.js";
+import CombatScene from "./CombatScene.js";
+import PacketType from "../multiplayer/PacketType.js";
+import Multiplayer from "../multiplayer/Multiplayer.js";
+import Character from "../character/Character.js";
+import Controller from "../character/Controller.js";
 
 class Button {
     constructor(text, onClick) {
@@ -25,6 +30,7 @@ export default class MenuScene extends Node {
 
         this.active = true;
         this.html = null;
+        /** @type {Multiplayer} */
         this.mp = mp;
         this.createHtml();
         Node.tagNode("MenuScene", this);
@@ -92,16 +98,16 @@ export default class MenuScene extends Node {
             setCookie("username", e.target.value);
         });
 
-    // Add username input to menu
-    this.html = document.createElement("div");
-    this.html.classList.add("menu-scene");
-    this.html.appendChild(usernameInput);
+        // Add username input to menu
+        this.html = document.createElement("div");
+        this.html.classList.add("menu-scene");
+        this.html.appendChild(usernameInput);
 
-    // Lobby UI
-    this.lobbyDiv = document.createElement("div");
-    this.lobbyDiv.classList.add("lobby-list");
-    this.lobbyDiv.innerHTML = `<h3>Lobby</h3><ul id="lobby-users"></ul>`;
-    this.html.appendChild(this.lobbyDiv);
+        // Lobby UI
+        this.lobbyDiv = document.createElement("div");
+        this.lobbyDiv.classList.add("lobby-list");
+        this.lobbyDiv.innerHTML = `<h3>Lobby</h3><ul id="lobby-users"></ul>`;
+        this.html.appendChild(this.lobbyDiv);
 
         let joinInput = document.createElement("input");
 
@@ -115,9 +121,19 @@ export default class MenuScene extends Node {
         let Join = new Button("Join Game", () => {
             console.log("Joining game...");
             this.mp.init(false);
+            this.mp.username = usernameInput.value;
             // Logic to join a game
         });
         Join.appendSelfTo(this.html);
+
+        let Start = new Button("Start Game", () => {
+            console.log("Starting game...");
+            this.active = false;
+            this.mp.sendPacket(PacketType.gotoCombat, {});
+            let cs = new CombatScene();
+            Engine.root.adopt(cs);
+        });
+        Start.appendSelfTo(this.html);
 
         // Input for joining a game
         joinInput.type = "text";
@@ -130,8 +146,10 @@ export default class MenuScene extends Node {
     }
 
     render(_) {
-        if (!this.active) {
-
+        if (this.active) {
+            this.html.style.visibility = "visible";
+        } else {
+            this.html.style.visibility = "hidden";
         }
     }
 }

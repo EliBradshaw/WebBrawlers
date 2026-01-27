@@ -1,6 +1,7 @@
-import CombatScene from "./scenes/CombatScene.js";
 import Engine from "./library/Engine.js";
 import Multiplayer from "./multiplayer/Multiplayer.js";
+import MenuScene from "./scenes/MenuScene.js";
+
 
 
 let multiplayer = new Multiplayer({
@@ -14,7 +15,7 @@ let multiplayer = new Multiplayer({
         console.log(`Peer connected: ${connection.id}`);
     },
     onMessage: (data) => {
-        console.log(`Received message: ${data}`);
+        
     },
     onError: (err) => {
         console.error(err);
@@ -23,4 +24,4 @@ let multiplayer = new Multiplayer({
 
 
 Engine.init();
-Engine.root.adopt(new CombatScene());
+Engine.root.adopt(new MenuScene(multiplayer));

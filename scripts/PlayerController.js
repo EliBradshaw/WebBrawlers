@@ -11,6 +11,7 @@ export default class PlayerController extends Controller {
     update() {
         let cols = this.character.colFlags;
         let input = Node.getNode("input");
+        this.input = input;
         let chr = this.character;
         let vel = chr.velocity;
 
@@ -30,7 +31,7 @@ export default class PlayerController extends Controller {
 
         if (input.keys.d) {
             if (vel.x < 0)
-                vel.x *= chr.stats.switchupSpeed;
+                vel.x *= cols.bottom ? chr.stats.switchupSpeed : chr.stats.switchupSpeedAir;
             // Approach characters full speed
             vel.x *= accel; // average
             vel.x += chr.stats.speed;
@@ -50,6 +51,10 @@ export default class PlayerController extends Controller {
         }
         if (!input.keys[" "] && vel.y < 0) {
             vel.y *= chr.stats.jumpFalloff
+        }
+
+        if (input.keys.s) {
+            vel.y += chr.stats.fastFall;
         }
 
         if (cols.bottom && this.coyoteTime < 0) { // just hit the floor
@@ -72,6 +77,13 @@ export default class PlayerController extends Controller {
             chr.aniTree.play("jump");
         }
 
-        chr.aniTree.isFlipped = vel.x < 0
+        chr.aniTree.isFlipped = vel.x < 0;
+
+        // Make sword follow mouse
+        let mouse = this.input.mouse;
+        let chrPos = chr.getGlobalPosition().with(chr.dimensions.scaled(0.5));
+        let dir = mouse.without(chrPos);
+        let angle = Math.atan2(dir.y, dir.x) * 180 / Math.PI;
+        chr.sword.rotation = angle;
     }
 }

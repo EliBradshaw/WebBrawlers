@@ -29,11 +29,13 @@ export default class Multiplayer extends Node {
         // For peer: a single connection.
         this.connection = null;
         // PacketHandler instance
-    this.packetHandler = new PacketHandler(this);
-    Node.tagNode('Multiplayer', this);
+        this.packetHandler = new PacketHandler(this);
+        Node.tagNode('Multiplayer', this);
 
         this.usernames = [];
-        this.usernameToConnections = {};
+        this.username = '';
+        this.connectionToUsername = {};
+        this.usernameToConnection = {};
     }
 
         /**
@@ -57,7 +59,7 @@ export default class Multiplayer extends Node {
     init(doHost) {
         // Get code from URL join
         const jc = document.getElementById('join-code');
-        const hostIdFromURL = jc?.value
+        const hostIdFromURL = jc?.value;
 
         if (!doHost) {
             // Act as a peer connecting to a host.

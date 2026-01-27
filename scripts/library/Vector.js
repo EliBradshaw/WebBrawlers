@@ -35,6 +35,10 @@ export default class Vector {
         return this;
     }
 
+    scaled(s) {
+        return new Vector(this.x * s, this.y * s);
+    }
+
     /** Sets this vector to have the same values as vec */
     take(vec) {
         this.x = vec.x;

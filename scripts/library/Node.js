@@ -43,6 +43,14 @@ export default class Node {
         return pos;
     }
 
+    setGlobalPosition(vec, y) {
+        if (typeof vec != "object")
+            vec = new Vector(vec, y);
+        let currentPos = this.getGlobalPosition();
+        let diff = vec.without(currentPos);
+        this.offset.add(diff);
+    }
+
     /** Adds a child node and sets its parent to this node */
     adopt(child) {
         this.children.push(child);
@@ -82,5 +90,13 @@ export default class Node {
 
     render(ctx, ui) {
         
+    }
+
+    mod(settings) {
+        for (let key in settings) {
+            this[key] = settings[key];
+        }
+
+        return this;
     }
 }
