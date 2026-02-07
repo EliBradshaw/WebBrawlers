@@ -8,6 +8,9 @@ export default class Engine {
     static waitMS = Engine.perfectMS;
     static root = new Node();
 
+    static debugRenders = [];
+
+
     static ctx = null;
     static ui = null;
 
@@ -30,11 +33,24 @@ export default class Engine {
         Engine.loop();
     }
 
+    static debugPoint(x, y, r=4) {
+        Engine.debugRenders.push({x, y, type: "point", data: {r}});
+    }
+
+    static debugTextAt(text, x, y) {
+        Engine.debugRenders.push({x, y, type: "text", data: {text}});
+    }
+
+    static debugRenderAdd(x, y, type="point", data={r: 4}) {
+        Engine.debugRenders.push({x, y, type, data});
+    }
+
     static debug(logMessage) {
         Engine.debugText += logMessage + "\n";
     }
 
     static loop() {
+        Engine.debugRenders = [];
         Engine.debugText = "";
         
         Engine.debugText += `FPS: ${Math.round(1000 / Engine.waitMS)}\n`
@@ -55,6 +71,18 @@ export default class Engine {
                 let line = lines[i];
                 Engine.ctx.fillStyle = "white";
                 Engine.ctx.fillText(line, 10, 1.5*(i+1)+7);
+            }
+        }
+
+        if (Engine.debugEnabled) {
+            for (let point of Engine.debugRenders) {
+                if (point.type == "point") {
+                    Engine.ctx.fillStyle = "red";
+                    Engine.ctx.fillRect(point.x-2, point.y-2, point.data.r, point.data.r);
+                } else if (point.type == "text"){
+                    Engine.ctx.fillStyle = "black";
+                    Engine.ctx.fillText(point.data.text, point.x, point.y);
+                }
             }
         }
 

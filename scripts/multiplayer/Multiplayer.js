@@ -183,7 +183,7 @@ export default class Multiplayer extends Node {
             if (this.connection && this.connection.open) {
                 this.connection.send(serialized);
             } else {
-                console.warn('No open connection to send data.');
+                // console.warn('No open connection to send data.');
             }
         }
     }

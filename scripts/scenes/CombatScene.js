@@ -12,9 +12,15 @@ export default class CombatScene extends Node {
     constructor() {
         super();
         this.platforms = [
-            new Platform(800, 50).moveGloballyTo(50, 300),
-            new Platform(100, 10).moveGloballyTo(200, 200).mod({passThrough: true}),
-            new Platform(100, 10).moveGloballyTo(500, 200),
+            new Platform(1300, 300).moveGloballyTo(50, 600),
+            new Platform(100, 1000).moveGloballyTo(0, 0),
+            new Platform(100, 1000).moveGloballyTo(1300, 0),
+
+            new Platform(100, 10).moveGloballyTo(200, 500),
+            new Platform(100, 10).moveGloballyTo(500, 500),
+            new Platform(100, 10).moveGloballyTo(700, 400),
+
+            new Platform(500, 20).moveGloballyTo(800, 300),
         ];
         this.characters = [
             new Character(PlayerController).moveGloballyTo(100, 200)

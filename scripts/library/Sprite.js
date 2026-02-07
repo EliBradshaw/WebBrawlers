@@ -19,6 +19,13 @@ export default class Sprite extends Node {
         this.extraRotation = extraRotation; // in degrees
     }
 
+    update() {
+        if (this.rotation > 360)
+            this.rotation -= 360;
+        else if (this.rotation < 0)
+            this.rotation += 360;
+    }
+
     render(ctx) {
         if (!this.loaded) return; // Wait for image to load
 

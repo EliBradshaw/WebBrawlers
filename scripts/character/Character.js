@@ -11,11 +11,11 @@ export default class Character extends MovingNode {
         super();
         this.controllerClass = controllerClass;
         this.controller = new controllerClass(this);
-        this.dimensions = new Vector(50, 35);
+        this.dimensions = new Vector(12, 35);
         this.velocity = new Vector();
 
         this.stats = {
-            acceleration: 20, // frames until full values are reached
+            acceleration: 30, // frames until full values are reached
             airAcceleration: 25,
             deaccel: 2,
             landingDeaccel: 1.5, // % left after landing
@@ -23,11 +23,11 @@ export default class Character extends MovingNode {
 
             switchupSpeed: 0.8, // % taken off speed when velx is opposite as wanted
             switchupSpeedAir : 1,
-            speed: 5,
+            speed: 4,
 
-            jumpFalloff: 0.8, // % taken off y when jump is not held and still going up
+            jumpFalloff: 0.9, // % taken off y when jump is not held and still going up
             jumpHeight: 10,
-            gravity: 0.5,
+            gravity: 0.4,
             coyoteTime: 10 // frames after leaving a platform where jump is still allowed
         }
 
@@ -60,10 +60,10 @@ export default class Character extends MovingNode {
                 tpf: 10,
                 scale: 3,
             }).nudge(0, 2),
-        ).nudge(0, -13));
+        ).nudge(-20, -13));
         this.aniTree.play("walk");
 
-        this.adopt(this.sword = new Sprite("sword.png", 0.05, 45, new Vector(1, 1)));
+        this.adopt(this.sword = new Sprite("sword.png", 0.05, 45, new Vector(1, 1)).nudge(-15, 0));
     }
 
     update() {
